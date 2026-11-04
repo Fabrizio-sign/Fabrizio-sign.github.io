@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 02 · Redesigning a digital experience</title>
+<style>
+:root{--ink:#1b1d29;--muted:#5d6173;--line:#dcdde4;--bg:#fafaf8;--card:#fff;--accent:#5b49e0;--amber:#ffb454}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:400 16px/1.65 Inter,"Segoe UI",system-ui,-apple-system,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+a{color:var(--accent)}
+img{max-width:100%;height:auto;display:block}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px}
+.sitenav{background:#000;padding:15px;text-align:center;border-bottom:1px solid #c9a96e;font-family:Arial,sans-serif;line-height:1.4}
+.sitenav a{color:#e8e8e8;margin:0 15px;text-decoration:none;font-size:16px;color:#e8e8e8}
+.sitenav a.on{color:#c9a96e}
+header{padding:28px 0 10px}
+.kicker{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:44px;line-height:1.1;margin:10px 0 10px;letter-spacing:-.02em}
+.meta{color:var(--muted);font-size:14.5px}
+section{padding:44px 0 4px}
+h2{font-size:26px;line-height:1.2;margin-bottom:12px;letter-spacing:-.01em}
+h2 span{color:var(--accent);margin-right:6px}
+h3{font-size:16px;margin-bottom:4px}
+p{margin-bottom:12px;max-width:720px}
+ul{margin:0 0 12px 22px;max-width:720px}li{margin-bottom:6px}
+.muted{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.facts .k{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.facts .v{font-weight:600;margin-top:2px}
+.ribbon{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 6px;font-size:14px}
+.node{padding:6px 12px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;font-weight:600}
+.node.new{background:var(--ink);color:#fff}
+.node.same{border-style:dashed;color:var(--muted);border-color:var(--muted)}
+.shot{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#0d0e12}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.steps .shot{height:340px;display:grid;place-items:center}
+.steps .shot img{max-height:320px;max-width:92%;width:auto}
+figure{margin:0}
+figcaption{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.5}
+figcaption b{color:var(--ink)}
+.stepcard{margin-top:10px}
+.badge{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:700 12.5px Arial,sans-serif;background:var(--amber);color:#2b1b00;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.45)}
+.badge.red{background:#e4566b;color:#fff}
+.problem{margin-top:16px;border-left:4px solid var(--accent);background:#f1effd;padding:14px 18px;border-radius:0 10px 10px 0;font-weight:500;max-width:760px}
+.annot{display:grid;grid-template-columns:1.9fr 1fr;gap:22px;align-items:start;margin-top:14px}
+.legend{list-style:none;margin:0}
+.legend li{display:grid;grid-template-columns:28px 1fr;gap:8px;margin-bottom:14px;font-size:15px;line-height:1.5}
+.legend .n{width:24px;height:24px;border-radius:50%;background:var(--amber);color:#2b1b00;display:grid;place-items:center;font:700 12px Arial,sans-serif;margin-top:2px}
+.legend b{display:block}
+.frames{display:grid;grid-template-columns:1fr 1fr;gap:22px 18px;margin-top:16px}
+.fno{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+table{width:100%;border-collapse:collapse;margin-top:16px;font-size:15px;background:#fff;border:1px solid var(--line)}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:#f1f1ee}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600}
+.lab{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+footer{margin-top:50px;padding:22px 0 40px;border-top:1px solid var(--line);font-size:13.5px;color:var(--muted)}
+@media (max-width:760px){h1{font-size:34px}.facts,.grid2,.annot,.frames{grid-template-columns:1fr}}
+@media print{
+  .sitenav{display:none}body{background:#fff}
+  .card,figure,table,.legend li,.problem{break-inside:avoid}
+  h2,h3,.fno{break-after:avoid}
+}
+@page{size:Letter;margin:0.55in}
+</style>
+</head>
+<body>
+<nav class="sitenav">
+  <a href="index.html">IKER FABRIZIO HERNÁNDEZ</a> |
+  <a href="labs.html" class="on">LABS</a> |
+  <a href="deliverables.html">PROJECT DELIVERABLES</a>
+</nav>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Lab 2 · Redesigning a digital experience</div>
+  <h1>Spotify: creating a playlist</h1>
+  <p class="meta">Iker Fabrizio Hernández · Tecnológico de Monterrey · Visual Design + UX/UI · November 3, 2026</p>
+  <p class="meta" style="margin-top:6px"><a href="Lab2_Spotify_Redesign.pdf">Download the PDF version</a></p>
+</header>
+
+<!-- 1 -->
+<section>
+  <h2><span>1.</span>Selected application</h2>
+  <p>I documented the desktop app of Spotify (Premium plan). The task is to create a new playlist and fill it with songs that fit together.</p>
+  <div class="facts">
+    <div class="card"><div class="k">App</div><div class="v">Spotify (desktop, Premium)</div></div>
+    <div class="card"><div class="k">Feature</div><div class="v">Create a playlist and add songs</div></div>
+    <div class="card"><div class="k">Task</div><div class="v">Build a playlist with one style</div></div>
+  </div>
+  <p class="muted" style="margin-top:10px;font-size:14px">My screenshots are in Spanish; the captions use the English labels.</p>
+</section>
+
+<!-- 2 -->
+<section>
+  <h2><span>2.</span>Current user flow</h2>
+  <p>To get the first song into a new playlist I need four actions:</p>
+  <div class="ribbon">
+    <span class="node">Your library</span>→
+    <span class="node">1. Create</span>→
+    <span class="node">2. Playlist</span>→
+    <span class="node">3. Add</span>→
+    <span class="node">4. ⊕ on a song</span>
+  </div>
+
+  <div class="grid2 steps">
+    <figure>
+      <div class="shot"><img src="step-1-library.png" alt="Your library panel with a Create button" width="482" height="980"></div>
+      <div class="card stepcard"><h3>Step 1 · Press Create</h3><p style="margin:0">In the Library panel, the “＋ Create” button is at the top right.</p></div>
+    </figure>
+    <figure>
+      <div class="shot"><img src="step-2-create-menu.png" alt="Create menu with Playlist, Mixed playlist, Blend, Folder and Jam" width="885" height="985"></div>
+      <div class="card stepcard"><h3>Step 2 · Choose “Playlist”</h3><p style="margin:0">A menu with five options opens. “Playlist” is the first one.</p></div>
+    </figure>
+  </div>
+
+  <figure style="margin-top:16px">
+    <div class="shot">
+      <img src="step-3-playlist-search.png" alt="New playlist with a Search panel showing recent searches and suggested songs" width="1916" height="911">
+      <span class="badge red" style="left:93.4%;top:50%">A</span>
+      <span class="badge red" style="left:75.9%;top:80%">B</span>
+      <span class="badge red" style="left:24.3%;top:92.5%">C</span>
+    </div>
+    <figcaption><b>Steps 3 and 4 · Add songs.</b> The new playlist opens and “Add” shows a Search panel on the right. Songs already added have a green ✓ and the rest have a ⊕. Below the recent searches there are suggested songs (B), and under the playlist a block called “Let’s find content for your playlist” (C).</figcaption>
+  </figure>
+</section>
+
+<!-- 3 -->
+<section>
+  <h2><span>3.</span>UX analysis</h2>
+  <ul>
+    <li><b>How many steps?</b> Four actions to add the first song, then one click per song.</li>
+    <li><b>Is the navigation clear?</b> Yes. Create → Playlist is simple and “Playlist” is the first option.</li>
+    <li><b>Is the feature easy to find?</b> Yes. Create is always visible in the Library panel.</li>
+    <li><b>Are the buttons easy to identify?</b> Mostly. In the Search panel one column mixes a ✓, a ⊕ and a › with no labels (A).</li>
+    <li><b>Is the information well organized?</b> Not completely. Recent searches and suggestions share one panel without a clear separation (B).</li>
+    <li><b>Confusing moments:</b> “Let’s find content for your playlist” (C) suggests songs chosen for my playlist, but my playlist is Spanish-language rock and the suggestions included an electronic remix, an urban track and a TV-series soundtrack. Nothing explains why, and I can’t remove them.</li>
+  </ul>
+  <div class="problem">Problem I chose to solve: the suggestions don’t match the style of my playlist, and I can’t understand or change them.</div>
+  <p style="margin-top:14px"><b>What I would change:</b> keep Create → Playlist as it is and improve the suggestions, so they follow the playlist and the user can control them.</p>
+</section>
+
+<!-- 4 -->
+<section>
+  <h2><span>4.</span>Design proposal</h2>
+  <p>The panel shows <b>what the suggestions are based on</b> (the style, language and era of the songs already in the playlist) as chips the user can switch off. Each suggestion says what it matches, and a ✕ hides the ones the user doesn’t want.</p>
+  <div class="annot">
+    <figure>
+      <div class="shot">
+        <img src="flow-3-three-songs.png" alt="Redesigned screen with chips, suggestions and reason lines" width="1920" height="1200">
+        <span class="badge" style="left:97.5%;top:22.5%">1</span>
+        <span class="badge" style="left:90.6%;top:47.4%">2</span>
+        <span class="badge" style="left:94%;top:41%">3</span>
+      </div>
+      <figcaption>Proposed screen with three songs in the playlist.</figcaption>
+    </figure>
+    <ol class="legend">
+      <li><span class="n">1</span><div><b>Chips</b>Style, language and era of the playlist. Tap one to stop matching it.</div></li>
+      <li><span class="n">2</span><div><b>Reason line</b>Each suggestion says what it matches.</div></li>
+      <li><span class="n">3</span><div><b>✕ Hide</b>Removes a suggestion the user doesn’t want, next to the ⊕.</div></li>
+    </ol>
+  </div>
+  <h3 style="margin-top:20px">Other changes</h3>
+  <ul>
+    <li><b>Steps:</b> the Find songs panel opens by default on a new playlist, so the first song takes 3 actions instead of 4.</li>
+    <li><b>Colors:</b> a dark base, violet for the main action (⊕) and amber for what the user can change (chips). Spotify’s green is not used.</li>
+    <li><b>Typography and icons:</b> one typeface (Inter) in regular and bold, and one set of simple line icons.</li>
+    <li><b>Feedback:</b> a short message after hiding a song, with an Undo button.</li>
+  </ul>
+</section>
+
+<!-- 5 -->
+<section>
+  <h2><span>5.</span>Proposed user flow</h2>
+  <p>The first two steps don’t change. The rest works like this:</p>
+  <div class="ribbon">
+    <span class="node same">1. Create</span>→
+    <span class="node same">2. Playlist</span>→
+    <span class="node new">3. ⊕ first song</span>→
+    <span class="node new">Suggestions match it</span>→
+    <span class="node new">⊕ add · ✕ hide · chip</span>
+  </div>
+  <div class="frames">
+    <figure><div class="fno">Frame 1</div>
+      <div class="shot"><img src="flow-1-empty.png" alt="Empty playlist with the Find songs panel open" width="1920" height="1200"></div>
+      <figcaption>The new playlist is empty and the Find songs panel is already open.</figcaption></figure>
+    <figure><div class="fno">Frame 2</div>
+      <div class="shot"><img src="flow-2-first-song.png" alt="After the first song, three chips and matching suggestions appear" width="1920" height="1200"></div>
+      <figcaption>After the first song, the chips appear and the suggestions match them.</figcaption></figure>
+    <figure><div class="fno">Frame 3</div>
+      <div class="shot"><img src="flow-3-three-songs.png" alt="Three songs added and a list of matching suggestions" width="1920" height="1200"></div>
+      <figcaption>With three songs, every suggestion is Spanish-language rock from the 80s–90s.</figcaption></figure>
+    <figure><div class="fno">Frame 4</div>
+      <div class="shot"><img src="flow-4-tuned.png" alt="The era chip is off, a song was hidden and an Undo message is shown" width="1920" height="1200"></div>
+      <figcaption>I switched off the “80s–90s” chip, so newer Spanish rock appears, and hid one song with ✕. A message offers Undo.</figcaption></figure>
+  </div>
+</section>
+
+<!-- 6 -->
+<section>
+  <h2><span>6.</span>Before and after</h2>
+  <div class="grid2">
+    <figure><div class="lab" style="color:#c2415a">Current</div>
+      <div class="shot"><img src="step-3-playlist-search.png" alt="Current Spotify playlist with Search panel" width="1916" height="911"></div></figure>
+    <figure><div class="lab" style="color:#2a7d5f">Proposed</div>
+      <div class="shot"><img src="flow-3-three-songs.png" alt="Proposed screen" width="1920" height="1200"></div></figure>
+  </div>
+  <table>
+    <thead><tr><th>Moment</th><th>Current</th><th>Proposed</th></tr></thead>
+    <tbody>
+      <tr><td>Actions to the first song</td><td>4</td><td>3 (the panel opens by default)</td></tr>
+      <tr><td>Why a song is suggested</td><td>Not explained</td><td>A reason line under each song</td></tr>
+      <tr><td>Control over suggestions</td><td>None, only ⊕</td><td>Chips to change them and ✕ to hide</td></tr>
+      <tr><td>Feedback after an action</td><td>Only a ✓ on added songs</td><td>A message with Undo</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 7 -->
+<section>
+  <h2><span>7.</span>Justification</h2>
+  <ul>
+    <li><b>UX (clarity and ease of use):</b> the problem I found, suggestions that seem random, is solved by showing what they are based on and letting the user change it. The steps that already worked stay the same.</li>
+    <li><b>UI and visual hierarchy:</b> the chips are boxed at the top because they control everything below. The ⊕ is the strongest button and the ✕ is quieter, so it is available but not distracting.</li>
+    <li><b>Consistency:</b> all four screens use the same colors, typeface and icons. Violet always means “add” and amber always means “what the suggestions match”.</li>
+    <li><b>Creativity:</b> instead of only changing how the list looks, I changed what the panel does: it explains its suggestions and accepts the user’s corrections.</li>
+    <li><b>Less effort:</b> one fewer action to the first song, and one click to hide a song that doesn’t belong.</li>
+  </ul>
+  <p class="muted" style="font-size:14.5px">Note: the mockups use a small set of example songs. A real version would need Spotify’s own data to decide what each song matches.</p>
+</section>
+
+<footer>Lab 2 · Visual Design + UX/UI · Tecnológico de Monterrey</footer>
+</div>
+</body>
+</html>
