@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 03 · Smart Parking Tec de Monterrey</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#111111;color:#e8e8e8;font-family:Arial,Helvetica,sans-serif;line-height:1.5}
+  nav{background:#000;padding:15px;text-align:center;border-bottom:1px solid #c9a96e}
+  nav a{color:#e8e8e8;margin:0 15px;text-decoration:none;font-size:16px}
+  nav a.on{color:#c9a96e}
+  main{max-width:1180px;margin:0 auto;padding:32px 20px 48px}
+  h1{color:#c9a96e;font-size:32px;margin:0 0 6px;text-align:center}
+  .sub{text-align:center;color:#a8a8a8;margin:0 0 28px}
+
+  .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .card{background:#1a1a1a;border:1px solid #2c2c2c;border-radius:8px;padding:16px 18px}
+  .card .lbl{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#a8a8a8}
+  .card .val{font-size:34px;font-weight:bold;margin-top:4px}
+  .card.total .val{color:#e8e8e8}
+  .card.occ .val{color:#e5604f}
+  .card.free .val{color:#58c27d}
+  .card.pct .val{color:#c9a96e}
+  .bar{height:8px;background:#2c2c2c;border-radius:4px;margin-top:10px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:#c9a96e;transition:width .5s ease}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .legend{display:flex;gap:18px;font-size:14px;color:#cfcfcf;flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:8px}
+  .sw{width:16px;height:10px;border-radius:3px;display:inline-block}
+  .sw.f{background:#58c27d}.sw.o{background:#e5604f}
+  .btns{display:flex;gap:10px}
+  button{background:transparent;color:#e8e8e8;border:1px solid #c9a96e;padding:9px 16px;font-size:14px;cursor:pointer;font-family:inherit}
+  button:hover{background:#c9a96e;color:#111}
+  button:focus-visible{outline:2px solid #c9a96e;outline-offset:2px}
+
+  .lot{position:relative;width:100%;aspect-ratio:1522/1256;border:1px solid #c9a96e;border-radius:6px;overflow:hidden;background:#000 url("estacionamiento.jpg") center/100% 100% no-repeat}
+  .lot::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.28)}
+  .spot{position:absolute;width:2.1%;height:1.15%;border-radius:2px;cursor:pointer;border:1px solid rgba(0,0,0,.55);transition:background .35s,box-shadow .35s;padding:0}
+  .spot.free{background:rgba(88,194,125,.92)}
+  .spot.occ{background:rgba(229,96,79,.92)}
+  .spot:hover{box-shadow:0 0 0 2px #fff;z-index:3}
+  .spot.flash{box-shadow:0 0 0 3px #c9a96e,0 0 14px 4px #c9a96e;z-index:2}
+  .spot:focus-visible{outline:2px solid #fff;z-index:3}
+
+  .log{margin-top:18px;background:#1a1a1a;border:1px solid #2c2c2c;border-radius:8px;padding:14px 18px;font-size:14px;color:#cfcfcf}
+  .log b{color:#c9a96e}
+  .log ul{list-style:none;margin:8px 0 0;padding:0;max-height:130px;overflow:auto;font-family:Consolas,monospace;font-size:13px}
+  .log li{padding:2px 0;border-bottom:1px solid #262626}
+  .note{color:#8f8f8f;font-size:13px;margin-top:14px;text-align:center}
+  @media(max-width:760px){.dash{grid-template-columns:repeat(2,1fr)}.card .val{font-size:28px}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html">IKER FABRIZIO HERNÁNDEZ</a> |
+  <a href="labs.html" class="on">LABS</a> |
+  <a href="deliverables.html">PROJECT DELIVERABLES</a>
+</nav>
+
+<main>
+  <h1>Smart Parking · Tec de Monterrey</h1>
+  <p class="sub">Simulated IoT sensors monitoring the parking lot in real time. Click any space to toggle it.</p>
+
+  <section class="dash" aria-label="Dashboard">
+    <div class="card total"><div class="lbl">Total spaces</div><div class="val" id="total">0</div></div>
+    <div class="card occ"><div class="lbl">Occupied</div><div class="val" id="occ">0</div></div>
+    <div class="card free"><div class="lbl">Available</div><div class="val" id="free">0</div></div>
+    <div class="card pct"><div class="lbl">Occupancy</div><div class="val" id="pct">0%</div><div class="bar"><i id="bar"></i></div></div>
+  </section>
+
+  <div class="controls">
+    <div class="legend">
+      <span><i class="sw f"></i>Available</span>
+      <span><i class="sw o"></i>Occupied</span>
+      <span><i class="sw" style="background:transparent;border:2px solid #c9a96e"></i>Sensor just changed</span>
+    </div>
+    <div class="btns">
+      <button id="toggle" type="button">Pause simulation</button>
+      <button id="reset" type="button">Randomize all</button>
+    </div>
+  </div>
+
+  <div class="lot" id="lot" role="group" aria-label="Parking lot map"></div>
+
+  <section class="log" aria-live="polite">
+    <b>Sensor log</b> <span id="status">· simulation running</span>
+    <ul id="log"></ul>
+  </section>
+
+  <p class="note">All sensor data on this page is simulated with JavaScript. No hardware is connected.</p>
+</main>
+
+<script>
+/* ---------- Layout of the spaces (coordinates in pixels of the 1522×1256 photo) ----------
+   Each block is a double row of spaces. a = top end of the centre line, b = bottom end,
+   n = spaces per side, w = half distance between the two sides. */
+const BLOCKS = [
+  {id:'A', a:[300,575],  b:[550,1140], n:16, w:33},
+  {id:'B', a:[480,500],  b:[710,990],  n:15, w:33},
+  {id:'C', a:[715,365],  b:[940,880],  n:15, w:33},
+  {id:'D', a:[930,270],  b:[1125,760], n:14, w:33},
+  {id:'E', a:[1060,175], b:[1315,690], n:15, w:33}
+];
+const W = 1522, H = 1256;
+const lot = document.getElementById('lot');
+const spots = [];
+
+BLOCKS.forEach(bl => {
+  const dx = bl.b[0]-bl.a[0], dy = bl.b[1]-bl.a[1];
+  const len = Math.hypot(dx,dy), ux = dx/len, uy = dy/len;
+  const px = -uy, py = ux;                         // perpendicular
+  const ang = Math.atan2(dy,dx)*180/Math.PI;       // direction of the row
+  for (let side=0; side<2; side++){
+    for (let i=0; i<bl.n; i++){
+      const t = (i+.5)/bl.n;
+      const off = (side?1:-1)*bl.w;
+      const x = bl.a[0]+dx*t+px*off, y = bl.a[1]+dy*t+py*off;
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'spot';
+      el.style.left = (x/W*100)+'%';
+      el.style.top  = (y/H*100)+'%';
+      el.style.transform = 'translate(-50%,-50%) rotate('+(ang+90)+'deg)';
+      const s = { el, name: bl.id+(side*bl.n+i+1), occupied:false };
+      el.setAttribute('aria-label', 'Space '+s.name);
+      el.title = 'Space '+s.name;
+      lot.appendChild(el);
+      spots.push(s);
+    }
+  }
+});
+
+/* ---------- State & rendering ---------- */
+const $ = id => document.getElementById(id);
+const logEl = $('log');
+function render(s, flash){
+  s.el.classList.toggle('occ', s.occupied);
+  s.el.classList.toggle('free', !s.occupied);
+  s.el.setAttribute('aria-pressed', s.occupied);
+  s.el.title = 'Space '+s.name+' · '+(s.occupied?'Occupied':'Available');
+  if (flash){
+    s.el.classList.add('flash');
+    setTimeout(()=>s.el.classList.remove('flash'), 1400);
+  }
+}
+function updateDashboard(){
+  const total = spots.length, occ = spots.filter(s=>s.occupied).length;
+  const pct = total ? Math.round(occ/total*100) : 0;
+  $('total').textContent = total;
+  $('occ').textContent = occ;
+  $('free').textContent = total-occ;
+  $('pct').textContent = pct+'%';
+  $('bar').style.width = pct+'%';
+}
+function addLog(msg){
+  const li = document.createElement('li');
+  li.textContent = new Date().toLocaleTimeString('en-GB')+'  '+msg;
+  logEl.prepend(li);
+  while (logEl.children.length > 40) logEl.lastChild.remove();
+}
+function setSpot(s, occupied, source){
+  s.occupied = occupied;
+  render(s, true);
+  updateDashboard();
+  addLog('['+source+'] Space '+s.name+' → '+(occupied?'OCCUPIED':'AVAILABLE'));
+}
+
+/* ---------- Simulated sensors ---------- */
+function randomizeAll(){
+  spots.forEach(s => { s.occupied = Math.random() < 0.65; render(s,false); });
+  updateDashboard();
+  addLog('[sensors] Full scan: all spaces re-read');
+}
+// Manual click → toggle
+spots.forEach(s => s.el.addEventListener('click', () => setSpot(s, !s.occupied, 'manual')));
+
+// Automatic updates: every 1.5 s one to three sensors report a change
+let timer = null;
+function tick(){
+  const changes = 1 + Math.floor(Math.random()*3);
+  for (let k=0; k<changes; k++){
+    const s = spots[Math.floor(Math.random()*spots.length)];
+    // slightly favour "car arrives" when the lot is emptier and "car leaves" when fuller
+    const occ = spots.filter(x=>x.occupied).length/spots.length;
+    const wantOccupied = Math.random() > occ;
+    setSpot(s, wantOccupied, 'sensor');
+  }
+}
+function start(){ timer = setInterval(tick, 1500); $('toggle').textContent='Pause simulation'; $('status').textContent='· simulation running'; }
+function stop(){ clearInterval(timer); timer=null; $('toggle').textContent='Resume simulation'; $('status').textContent='· simulation paused'; }
+$('toggle').addEventListener('click', () => timer ? stop() : start());
+$('reset').addEventListener('click', randomizeAll);
+
+randomizeAll();
+start();
+</script>
+</body>
+</html>
